@@ -1,15 +1,14 @@
-CC := gcc
-CFLAGS := -Wall -Wextra -Iinclude -g
-
+CC := cc
+CFLAGS := -Wall -Wextra -Iinclude -g -MMD -MP
 SRC_DIR := src
 BIN_DIR := bin
 EX_DIR := examples
-
-SRC := $(wildcard $(SRC_DIR)/*.c)
+SRC := $(shell find $(SRC_DIR) -name '*.c')
 OBJ := $(patsubst $(SRC_DIR)/%.c,$(BIN_DIR)/%.o,$(SRC))
-
 LIB := $(BIN_DIR)/libmeow.a
 EXAMPLE := $(BIN_DIR)/demo
+
+.PHONY: all example clean run print
 
 all: $(LIB) example
 
@@ -19,18 +18,24 @@ $(LIB): $(OBJ)
 	ar rcs $@ $(OBJ)
 	@echo "Library built: $@"
 
-# Compile object files
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(BIN_DIR)
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Build example and link library
-example: $(LIB)
+example: $(EXAMPLE)
+
+$(EXAMPLE): $(LIB)
 	$(CC) $(CFLAGS) $(EX_DIR)/demo.c -L$(BIN_DIR) -lmeow -o $(EXAMPLE)
 	@echo "Example built: $(EXAMPLE)"
 
 clean:
 	rm -rf $(BIN_DIR)
 
-run: example
+run: $(EXAMPLE)
 	./$(EXAMPLE)
+
+print:
+	@echo "SRC: $(SRC)"
+	@echo "OBJ: $(OBJ)"
+
+-include $(OBJ:.o=.d)

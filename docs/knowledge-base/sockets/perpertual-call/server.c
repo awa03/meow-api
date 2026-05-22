@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <strings.h>
 #include <sys/socket.h>
@@ -69,7 +70,38 @@ int main(){
 
   int listening = listen(sockfd, ATTEMPTS_UNTIL_REFUSE);
 
+  int flag = 0;
+  
+  // "game loop"
+  while(1){
+    const unsigned int in_sock_sz = sizeof(in_sock);
+    int in_sockfd = accept(sockfd, (struct sockaddr *) &in_sock, (socklen_t*) &in_sock_sz);
 
+    if(in_sockfd < 0){
+      printerr("invalid file descriptor during accept function call");
+    }
+
+
+    char* resp_one = "Whats good slimerson\0";
+    char* resp_two = "Woah how'd the result change\0";
+
+    int write_bytes;
+    if(flag){
+      write_bytes = write(in_sockfd, resp_one, strlen(resp_one));
+    }
+    else {
+      write_bytes = write(in_sockfd, resp_two, strlen(resp_two));
+    }
+
+    if(write_bytes < 0){
+      printerr("while writing to outbound file descriptor");
+    }
+
+    flag++;
+    flag = flag % 2;
+
+    close(in_sockfd);
+  }
 
   return EXIT_SUCCESS;
 }
