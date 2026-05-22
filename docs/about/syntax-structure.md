@@ -11,8 +11,8 @@ All functions will be named using the snake case syntax seen below.
 
 ```
 init();
-add_s_log("error invalid credentials");
-add_err_log(err);
+add_log_s("error invalid credentials");
+add_log_err(err);
 ```
 
-"Overloaded functions" (same functionality different argument type) will **always** be denoted by the second word within the function name.
+"Overloaded functions" (same functionality different argument type) will **always** be denoted by the last word within the function name. This is in an effort to enforce compatibility following function refactors.
