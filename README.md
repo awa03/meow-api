@@ -1,3 +1,3 @@
-Simple API Library for C/C++
+Simple Web Server Library for C/C++
 
 
